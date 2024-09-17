@@ -1,4 +1,7 @@
-# Homework Template for CMSI 3801
+# Homework Folder for CMSI 3801
+### By Patrick King
+### Fall 2024
+### Languages and Automata I
 
 Welcome!
 
@@ -11,6 +14,7 @@ Don’t bother with notes to the graders. Such notes go into your BrightSpace su
 Your homework submissions will consist of programs in the following languages. To keep things simple, there is a separate folder for each language.
 
 - **Homework 1 (Scripting)**: Lua, Python, JavaScript
+    - **COMPLETED**
 - **Homework 2 (Enterprise)**: Java, Kotlin, Swift
 - **Homework 3 (Theory)**: TypeScript, OCaml, Haskell
 - **Homework 4 (Systems)**: C, C++, Rust
