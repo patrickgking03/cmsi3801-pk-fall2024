@@ -15,148 +15,142 @@ func change(_ amount: Int) -> Result<[Int:Int], NegativeAmountError> {
     return .success(counts)
 }
 
-// Write your first then lower case function here
-func firstThenLowerCase(of list: [String], satisfying predicate: (String) -> Bool) -> String? {
-    return list.first(where: predicate)?.lowercased()
+func firstThenLowerCase(
+    of strings: [String], satisfying predicate: (String) -> Bool
+) -> String? {
+    return strings.first(where: predicate)?.lowercased()
 }
 
-// Write your say function here
-class Say {
-    private var phraseBuilder: String = ""
-    
-    init(_ phrase: String = "") {
-        self.phraseBuilder = phrase
-    }
-    
-    func and(_ nextPart: String) -> Say {
-        phraseBuilder += phraseBuilder.isEmpty ? nextPart : " \(nextPart)"
-        return self
-    }
-    
-    var phrase: String {
-        return phraseBuilder
+struct Sayer {
+    let phrase: String
+    func and(_ word: String) -> Sayer {
+        return Sayer(phrase: "\(self.phrase) \(word)")
     }
 }
 
-func say() -> Say {
-    return Say()
+func say(_ word: String = "") -> Sayer {
+    return Sayer(phrase: word)
 }
 
-func say(_ phrase: String) -> Say {
-    return Say(phrase)
-}
-
-// Write your meaningfulLineCount function here
-func meaningfulLineCount(_ filePath: String) async -> Result<Int, Error> {
+func meaningfulLineCount(_ filename: String) async -> Result<Int, Error> {
+    var count = 0
     do {
-        let fileURL = URL(fileURLWithPath: filePath)
-        let content = try String(contentsOf: fileURL)
-        let lineCount = content.split { $0.isNewline }.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.count
-        return .success(lineCount)
+        let url = URL(fileURLWithPath: filename)
+        for try await line in url.lines {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if !trimmed.isEmpty && !trimmed.hasPrefix("#") {
+                count += 1
+            }
+        }
+        return .success(count)
     } catch {
         return .failure(NoSuchFileError())
     }
 }
 
-// Write your Quaternion struct here
-struct Quaternion: Equatable {
-    var a: Double
-    var b: Double
-    var c: Double
-    var d: Double
-    
-    static let ZERO = Quaternion(a: 0, b: 0, c: 0, d: 0)
-    static let I = Quaternion(a: 0, b: 1, c: 0, d: 0)
-    static let J = Quaternion(a: 0, b: 0, c: 1, d: 0)
-    static let K = Quaternion(a: 0, b: 0, c: 0, d: 1)
-    
-    func conjugate() -> Quaternion {
-        return Quaternion(a: a, b: -b, c: -c, d: -d)
+struct Quaternion: CustomStringConvertible, Equatable {
+    let a: Double
+    let b: Double
+    let c: Double
+    let d: Double
+
+    static let ZERO = Quaternion()
+    static let I = Quaternion(b: 1)
+    static let J = Quaternion(c: 1)
+    static let K = Quaternion(d: 1)
+
+    init(a: Double = 0, b: Double = 0, c: Double = 0, d: Double = 0) {
+        self.a = a
+        self.b = b
+        self.c = c
+        self.d = d
     }
-    
+
     var coefficients: [Double] {
-        return [a, b, c, d]
+        return [self.a, self.b, self.c, self.d]
     }
-    
-    static func +(lhs: Quaternion, rhs: Quaternion) -> Quaternion {
-        return Quaternion(a: lhs.a + rhs.a, b: lhs.b + rhs.b, c: lhs.c + rhs.c, d: lhs.d + rhs.d)
+
+    var conjugate: Quaternion {
+        return Quaternion(a: self.a, b: -self.b, c: -self.c, d: -self.d)
     }
-    
-    static func *(lhs: Quaternion, rhs: Quaternion) -> Quaternion {
+
+
+    static func +(q1: Quaternion, q2: Quaternion) -> Quaternion {
         return Quaternion(
-            a: lhs.a * rhs.a - lhs.b * rhs.b - lhs.c * rhs.c - lhs.d * rhs.d,
-            b: lhs.a * rhs.b + lhs.b * rhs.a + lhs.c * rhs.d - lhs.d * rhs.c,
-            c: lhs.a * rhs.c - lhs.b * rhs.d + lhs.c * rhs.a + lhs.d * rhs.b,
-            d: lhs.a * rhs.d + lhs.b * rhs.c - lhs.c * rhs.b + lhs.d * rhs.a
+            a: q1.a + q2.a,
+            b: q1.b + q2.b,
+            c: q1.c + q2.c,
+            d: q1.d + q2.d
         )
     }
-    
-    static func ==(lhs: Quaternion, rhs: Quaternion) -> Bool {
-        return lhs.a == rhs.a && lhs.b == rhs.b && lhs.c == rhs.c && lhs.d == rhs.d
+
+    static func *(q1: Quaternion, q2: Quaternion) -> Quaternion {
+        return Quaternion(
+            a: q2.a * q1.a - q2.b * q1.b - q2.c * q1.c - q2.d * q1.d,
+            b: q2.a * q1.b + q2.b * q1.a - q2.c * q1.d + q2.d * q1.c,
+            c: q2.a * q1.c + q2.b * q1.d + q2.c * q1.a - q2.d * q1.b,
+            d: q2.a * q1.d - q2.b * q1.c + q2.c * q1.b + q2.d * q1.a
+        )
     }
-    
+
     var description: String {
-        var result = ""
-        if a != 0 { result += "\(a)" }
-        if b != 0 { result += (b > 0 && !result.isEmpty ? "+" : "") + "\(b)i" }
-        if c != 0 { result += (c > 0 && !result.isEmpty ? "+" : "") + "\(c)j" }
-        if d != 0 { result += (d > 0 && !result.isEmpty ? "+" : "") + "\(d)k" }
-        return result.isEmpty ? "0" : result
+        var s = ""
+        for (c, unit) in zip(self.coefficients, ["", "i", "j", "k"]) where c != 0 {
+            s += c < 0 ? "-" : s == "" ? "" : "+"
+            s += abs(c) == 1 && unit != "" ? "" : String(abs(c))
+            s += unit
+        }
+        return s.isEmpty ? "0" : s
     }
 }
 
-// Write your Binary Search Tree enum here
-enum BinarySearchTree {
+enum BinarySearchTree: CustomStringConvertible {
     case empty
     indirect case node(String, BinarySearchTree, BinarySearchTree)
-    
-    func insert(_ newValue: String) -> BinarySearchTree {
-        switch self {
-        case .empty:
-            return .node(newValue, .empty, .empty)
-        case let .node(value, left, right):
-            if newValue < value {
-                return .node(value, left.insert(newValue), right)
-            } else if newValue > value {
-                return .node(value, left, right.insert(newValue))
-            } else {
-                return self
-            }
-        }
-    }
-    
-    func contains(_ value: String) -> Bool {
-        switch self {
-        case .empty:
-            return false
-        case let .node(nodeValue, left, right):
-            if value == nodeValue {
-                return true
-            } else if value < nodeValue {
-                return left.contains(value)
-            } else {
-                return right.contains(value)
-            }
-        }
-    }
-    
+
     var size: Int {
         switch self {
         case .empty:
             return 0
         case let .node(_, left, right):
-            return 1 + left.size + right.size
+            return left.size + right.size + 1
         }
     }
-}
 
-extension BinarySearchTree: CustomStringConvertible {
+    func insert(_ data: String) -> BinarySearchTree {
+        switch self {
+        case .empty:
+            return .node(data, .empty, .empty)
+        case let .node(selfData, left, right):
+            if data < selfData {
+                return .node(selfData, left.insert(data), right)
+            } else if data > selfData {
+                return .node(selfData, left, right.insert(data))
+            }
+            return self
+        }
+    }
+
+    func contains(_ data: String) -> Bool {
+        switch self {
+        case .empty:
+            return false
+        case let .node(selfData, left, right):
+            if data < selfData {
+                return left.contains(data)
+            } else if data > selfData {
+                return right.contains(data)
+            }
+            return true
+        }
+    }
+
     var description: String {
         switch self {
         case .empty:
             return "()"
-        case let .node(value, left, right):
-            return "(\(left)\(value)\(right))"
+        case let .node(data, left, right):
+            return "(\(left)\(data)\(right))".replacingOccurrences(of: "()", with: "")
         }
     }
 }

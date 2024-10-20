@@ -20,164 +20,138 @@ public class Exercises {
         return counts;
     }
 
-    // firstThenLowerCase method
-    public static Optional<String> firstThenLowerCase(List<String> list, Predicate<String> predicate) {
-        return list.stream()
-                   .filter(predicate)
-                   .map(String::toLowerCase)
-                   .findFirst();
+    static Optional<String> firstThenLowerCase(
+            List<String> strings, Predicate<String> predicate) {
+        return strings.stream()
+                .filter(predicate)
+                .findFirst()
+                .map(String::toLowerCase);
     }
 
-    // meaningfulLineCount method
-    public static long meaningfulLineCount(String filePath) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            return reader.lines()
-                         .filter(line -> !line.trim().isEmpty())
-                         .count();
+    static record Sayer(String phrase) {
+        Sayer and(String word) {
+            return new Sayer(phrase + ' ' + word);
         }
     }
 
-    // say method
-    public static Say say() {
-        return new Say("");
+    static Sayer say() {
+        return new Sayer("");
     }
 
-    public static Say say(String phrase) {
-        return new Say(phrase);
+    static Sayer say(String word) {
+        return new Sayer(word);
     }
 
-    public static class Say {
-        private String phrase;
-
-        public Say(String phrase) {
-            this.phrase = phrase;
+    static long meaningfulLineCount(String filename) throws IOException {
+        try (var reader = new BufferedReader(new FileReader(filename))) {
+             return reader.lines()
+                .map(String::trim)
+                .filter(line -> !line.isBlank() && !line.startsWith("#"))
+                .count();
         }
+    }
+}
 
-        public Say and(String nextPart) {
-            this.phrase += " " + nextPart;
+record Quaternion(double a, double b, double c, double d) {
+
+    public static final Quaternion ZERO = new Quaternion(0, 0, 0, 0);
+    public static final Quaternion I = new Quaternion(0, 1, 0, 0);
+    public static final Quaternion J = new Quaternion(0, 0, 1, 0);
+    public static final Quaternion K = new Quaternion(0, 0, 0, 1);
+
+    public Quaternion {
+        if (Double.isNaN(a) || Double.isNaN(b) || Double.isNaN(c) || Double.isNaN(d)) {
+            throw new IllegalArgumentException("Coefficients cannot be NaN");
+        }
+    }
+
+    public Quaternion plus(Quaternion q) {
+        return new Quaternion(a + q.a, b + q.b, c + q.c, d + q.d);
+    }
+
+    public Quaternion times(Quaternion q) {
+        return new Quaternion(
+                q.a * a - q.b * b - q.c * c - q.d * d,
+                q.a * b + q.b * a - q.c * d + q.d * c,
+                q.a * c + q.b * d + q.c * a - q.d * b,
+                q.a * d - q.b * c + q.c * b + q.d * a);
+    }
+
+    public Quaternion conjugate() {
+        return new Quaternion(a, -b, -c, -d);
+    }
+
+    public List<Double> coefficients() {
+        return List.of(a, b, c, d);
+    }
+
+    @Override public String toString() {
+        var builder = new StringBuilder();
+        var units = new String[]{"", "i", "j", "k"};
+        for (var i = 0; i < units.length; i++) {
+            var unit = units[i];
+            var c = coefficients().get(i);
+            if (c == 0) continue;
+            builder.append(c < 0 ? "-" : builder.length() > 0 ? "+" : "");
+            builder.append(Math.abs(c) != 1 || unit.isEmpty() ? Math.abs(c) : "");
+            builder.append(unit);
+        }
+        return builder.isEmpty() ? "0" : builder.toString();
+    }
+}
+
+sealed interface BinarySearchTree permits Empty, Node {
+    int size();
+    BinarySearchTree insert(String data);
+    boolean contains(String data);
+}
+
+final record Empty() implements BinarySearchTree {
+    @Override public int size() {
+        return 0;
+    }
+
+    @Override public BinarySearchTree insert(String data) {
+        return new Node(data, this, this);
+    }
+
+    @Override public boolean contains(String data) {
+        return false;
+    }
+
+    @Override public String toString() {
+        return "()";
+    }
+}
+
+final record Node (
+        String data, BinarySearchTree left, BinarySearchTree right)
+        implements BinarySearchTree {
+    @Override public int size() {
+        return left.size() + right.size() + 1;
+    }
+
+    @Override public BinarySearchTree insert(String data) {
+        if (data.compareTo(this.data) < 0) {
+            return new Node(this.data, left.insert(data), right);
+        } else if (data.compareTo(this.data) > 0) {
+            return new Node(this.data, left, right.insert(data));
+        } else {
             return this;
         }
+    }
 
-        public String phrase() {
-            return this.phrase;
+    @Override public boolean contains(String data) {
+        if (data.compareTo(this.data) < 0) {
+            return left.contains(data);
+        } else if (data.compareTo(this.data) > 0) {
+            return right.contains(data);
+        } else {
+            return true;
         }
     }
 
-    // Quaternion class
-    public static record Quaternion(double a, double b, double c, double d) {
-
-        public Quaternion {
-            if (Double.isNaN(a) || Double.isNaN(b) || Double.isNaN(c) || Double.isNaN(d)) {
-                throw new IllegalArgumentException("Coefficients cannot be NaN");
-            }
-        }
-
-        public Quaternion plus(Quaternion other) {
-            return new Quaternion(this.a + other.a, this.b + other.b, this.c + other.c, this.d + other.d);
-        }
-
-        public Quaternion times(Quaternion other) {
-            return new Quaternion(
-                this.a * other.a - this.b * other.b - this.c * other.c - this.d * other.d,
-                this.a * other.b + this.b * other.a + this.c * other.d - this.d * other.c,
-                this.a * other.c - this.b * other.d + this.c * other.a + this.d * other.b,
-                this.a * other.d + this.b * other.c - this.c * other.b + this.d * other.a
-            );
-        }
-
-        public Quaternion conjugate() {
-            return new Quaternion(a, -b, -c, -d);
-        }
-
-        public List<Double> coefficients() {
-            return List.of(a, b, c, d);
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder result = new StringBuilder();
-            if (a != 0) result.append(a);
-            if (b != 0) result.append((b > 0 && result.length() > 0 ? "+" : "")).append(b).append("i");
-            if (c != 0) result.append((c > 0 && result.length() > 0 ? "+" : "")).append(c).append("j");
-            if (d != 0) result.append((d > 0 && result.length() > 0 ? "+" : "")).append(d).append("k");
-            return result.toString().isEmpty() ? "0" : result.toString();
-        }
-
-        public static final Quaternion ZERO = new Quaternion(0, 0, 0, 0);
-        public static final Quaternion I = new Quaternion(0, 1, 0, 0);
-        public static final Quaternion J = new Quaternion(0, 0, 1, 0);
-        public static final Quaternion K = new Quaternion(0, 0, 0, 1);
-    }
-
-    // BinarySearchTree
-    public sealed interface BinarySearchTree permits Empty, Node {
-        BinarySearchTree insert(String value);
-        boolean contains(String value);
-        int size();
-    }
-
-    public static final class Empty implements BinarySearchTree {
-        @Override
-        public BinarySearchTree insert(String value) {
-            return new Node(value, this, this);
-        }
-
-        @Override
-        public boolean contains(String value) {
-            return false;
-        }
-
-        @Override
-        public int size() {
-            return 0;
-        }
-
-        @Override
-        public String toString() {
-            return "()";
-        }
-    }
-
-    public static final class Node implements BinarySearchTree {
-        private final String value;
-        private final BinarySearchTree left, right;
-
-        public Node(String value, BinarySearchTree left, BinarySearchTree right) {
-            this.value = value;
-            this.left = left;
-            this.right = right;
-        }
-
-        @Override
-        public BinarySearchTree insert(String newValue) {
-            if (newValue.compareTo(value) < 0) {
-                return new Node(value, left.insert(newValue), right);
-            } else if (newValue.compareTo(value) > 0) {
-                return new Node(value, left, right.insert(newValue));
-            } else {
-                return this;
-            }
-        }
-
-        @Override
-        public boolean contains(String value) {
-            if (value.equals(this.value)) {
-                return true;
-            } else if (value.compareTo(this.value) < 0) {
-                return left.contains(value);
-            } else {
-                return right.contains(value);
-            }
-        }
-
-        @Override
-        public int size() {
-            return 1 + left.size() + right.size();
-        }
-
-        @Override
-        public String toString() {
-            return "(" + left + value + right + ")";
-        }
+    @Override public String toString() {
+        return ("(" + left + data + right + ")").replace("()", "");
     }
 }
