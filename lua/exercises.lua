@@ -13,20 +13,23 @@ function change(amount)
   return counts
 end
 
--- Write your first then lower case function here
-function first_then_lower_case(sequence, predicate)
-  for _, str in ipairs(sequence) do
-    if predicate(str) then
-      return string.lower(str)
+function first_then_lower_case(array, predicate)
+  local first = nil
+  for _, s in ipairs(array) do
+    if predicate(s) then
+      first = s
+      break
     end
   end
-  return nil
+  if first == nil then
+    return nil
+  end
+  return string.lower(first)
 end
 
--- Write your powers generator here
 function powers_generator(base, limit)
+  local power = 1
   return coroutine.create(function()
-    local power = 1
     while power <= limit do
       coroutine.yield(power)
       power = power * base
@@ -34,112 +37,73 @@ function powers_generator(base, limit)
   end)
 end
 
--- Write your say function here
 function say(word)
-  local sentence = word or ""
-
-  return function(next_word)
-    if next_word == nil then
-      return sentence
-    elseif next_word == "" then
-      sentence = sentence .. " "
+  if word == nil then
+    return ""
+  end
+  return function(next)
+    if next == nil then
+      return word
     else
-      if sentence ~= "" then
-        sentence = sentence .. " " .. next_word
-      else
-        sentence = next_word
-      end
+      return say(word .. " " .. next)
     end
-    return say(sentence)
   end
 end
 
--- Write your line count function here
 function meaningful_line_count(filename)
-  local file = io.open(filename, "r")
-  
-  if not file then
+  local count = 0
+  local file = io.open(filename, 'r')
+  if file == nil then
     error("No such file")
   end
-  
-  local count = 0
   for line in file:lines() do
-    if line:match("^%s*$") == nil and line:match("^%s*#") == nil then
-      count = count + 1
+    line = line:match "^%s*(.*)"
+    if line ~= "" and line:sub(1, 1) ~= "#" then
+        count = count + 1
     end
   end
-  
   file:close()
   return count
 end
 
--- Write your quaternion class here
-Quaternion = {}
-Quaternion.__index = Quaternion
-
-function Quaternion.new(a, b, c, d)
-  local self = setmetatable({}, Quaternion)
-  self.a = a
-  self.b = b
-  self.c = c
-  self.d = d
-  return self
-end
-
-function Quaternion:coefficients()
-  return {self.a, self.b, self.c, self.d}
-end
-
-function Quaternion:conjugate()
-  return Quaternion.new(self.a, -self.b, -self.c, -self.d)
-end
-
-function Quaternion.__add(q1, q2)
-  return Quaternion.new(
-    q1.a + q2.a, 
-    q1.b + q2.b, 
-    q1.c + q2.c, 
-    q1.d + q2.d
-  )
-end
-
-function Quaternion.__mul(q1, q2)
-  local a = q1.a * q2.a - q1.b * q2.b - q1.c * q2.c - q1.d * q2.d
-  local b = q1.a * q2.b + q1.b * q2.a + q1.c * q2.d - q1.d * q2.c
-  local c = q1.a * q2.c - q1.b * q2.d + q1.c * q2.a + q1.d * q2.b
-  local d = q1.a * q2.d + q1.b * q2.c - q1.c * q2.b + q1.d * q2.a
-  return Quaternion.new(a, b, c, d)
-end
-
-function Quaternion.__eq(q1, q2)
-  return q1.a == q2.a and q1.b == q2.b and q1.c == q2.c and q1.d == q2.d
-end
-
-function Quaternion:__tostring()
-  local parts = {}
-
-  if self.a ~= 0 then 
-    table.insert(parts, tostring(self.a)) 
+Quaternion = (function (class)
+  local meta = {
+    __add = function(self, q)
+      return class.new(self.a + q.a, self.b + q.b, self.c + q.c, self.d + q.d)
+    end,
+    __mul = function(self, q)
+      return class.new(
+        q.a * self.a - q.b * self.b - q.c * self.c - q.d * self.d,
+        q.a * self.b + q.b * self.a - q.c * self.d + q.d * self.c,
+        q.a * self.c + q.b * self.d + q.c * self.a - q.d * self.b,
+        q.a * self.d - q.b * self.c + q.c * self.b + q.d * self.a
+      )
+    end,
+    __eq = function(self, q)
+      return self.a == q.a and self.b == q.b and self.c == q.c and self.d == q.d
+    end,
+    __tostring = function(self)
+      local s = ""
+      for i, c in ipairs(self:coefficients()) do
+        if c ~= 0 then
+          s = s .. (c < 0 and "-" or s == "" and "" or "+")
+          s = s .. ((i ~= 1 and math.abs(c) == 1) and "" or tostring(math.abs(c)))
+          s = s .. ({"", "i", "j", "k"})[i]
+        end
+      end
+      return s == "" and "0" or s
+    end,
+    __index = {
+      coefficients = function(self)
+        return {self.a, self.b, self.c, self.d}
+      end,
+      conjugate = function(self)
+        return class.new(self.a, -self.b, -self.c, -self.d)
+      end
+    },
+  }
+  class.new = function (a, b, c, d)
+    return setmetatable({a = a, b = b, c = c, d = d}, meta)
   end
-
-  if self.b ~= 0 then 
-    local sign = (self.b > 0 and (#parts > 0 and "+" or "") or "") 
-    table.insert(parts, sign .. (math.abs(self.b) == 1 and "i" or tostring(self.b) .. "i")) 
-  end
-
-  if self.c ~= 0 then 
-    local sign = (self.c > 0 and (#parts > 0 and "+" or "") or "") 
-    table.insert(parts, sign .. (math.abs(self.c) == 1 and "j" or tostring(self.c) .. "j")) 
-  end
-
-  if self.d ~= 0 then 
-    local sign = (self.d > 0 and (#parts > 0 and "+" or "") or "") 
-    table.insert(parts, sign .. (math.abs(self.d) == 1 and "k" or tostring(self.d) .. "k")) 
-  end
-
-  if #parts == 0 then 
-    return "0" 
-  end
-  
-  return table.concat(parts)
-end
+  return class
+end)({})
