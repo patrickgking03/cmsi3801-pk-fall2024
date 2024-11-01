@@ -16,7 +16,9 @@ Your homework submissions will consist of programs in the following languages. T
 - **Homework 1 (Scripting)**: Lua, Python, JavaScript
     - **COMPLETED**
 - **Homework 2 (Enterprise)**: Java, Kotlin, Swift
+    - **COMPLETED**
 - **Homework 3 (Theory)**: TypeScript, OCaml, Haskell
+    - **COMPLETED**
 - **Homework 4 (Systems)**: C, C++, Rust
 - **Homework 5 (Concurrency)**: Go
 

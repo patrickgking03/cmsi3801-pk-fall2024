@@ -46,10 +46,12 @@ let meaningful_line_count filename =
 type shape =
   | Box of { width : float; length : float; depth : float }
   | Sphere of { radius : float }
+
 let volume shape =
   match shape with
   | Box { width; length; depth } -> width *. length *. depth
   | Sphere { radius } -> (4.0 /. 3.0) *. Float.pi *. (radius ** 3.0)
+
 let surface_area shape =
   match shape with
   | Box { width; length; depth } ->
@@ -61,6 +63,7 @@ module BinarySearchTree = struct
   type 'a tree =
     | Empty
     | Node of { value : 'a; left : 'a tree; right : 'a tree }
+
   let rec insert tree value =
     match tree with
     | Empty -> Node { value; left = Empty; right = Empty }
@@ -68,15 +71,18 @@ module BinarySearchTree = struct
         if value < v then Node { value = v; left = insert left value; right }
         else if value > v then Node { value = v; left; right = insert right value }
         else tree
+
   let rec contains tree value =
     match tree with
     | Empty -> false
     | Node { value = v; left; right } ->
         if value = v then true else if value < v then contains left value else contains right value
+
   let rec size tree =
     match tree with
     | Empty -> 0
     | Node { left; right; _ } -> 1 + size left + size right
+
   let rec inorder tree =
     match tree with
     | Empty -> Seq.empty
@@ -84,6 +90,7 @@ module BinarySearchTree = struct
         let left_seq = inorder left in
         let right_seq = inorder right in
         Seq.append left_seq (Seq.cons value right_seq)
+
   let to_string tree =
     let rec aux tree =
       match tree with
