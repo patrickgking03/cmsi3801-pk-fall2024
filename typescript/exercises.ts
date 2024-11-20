@@ -1,5 +1,3 @@
-import { createReadStream } from 'fs';
-import * as readline from 'readline';
 import { open } from "node:fs/promises"
 
 export function change(amount: bigint): Map<bigint, bigint> {
@@ -15,118 +13,130 @@ export function change(amount: bigint): Map<bigint, bigint> {
   return counts
 }
 
-// Write your first then apply function here
 export function firstThenApply<T, U>(
-  arr: T[],
-  predicate: (item: T) => boolean,
-  func: (item: T) => U
+  array: T[],
+  predicate: (x: T) => boolean,
+  consumer: (x: T) => U | undefined
 ): U | undefined {
-  const found = arr.find(predicate);
-  return found !== undefined ? func(found) : undefined;
+  const first = array.find(predicate)
+  if (first) {
+    return consumer(first)
+  }
+  return undefined
 }
 
-// Write your powers generator here
 export function* powersGenerator(base: bigint): Generator<bigint> {
-  let current = 1n;
-  while (true) {
-    yield current;
-    current *= base;
+  for (let power = 1n; true; power *= base) {
+    yield power
   }
 }
 
-// Write your line count function here
-export async function meaningfulLineCount(filePath: string): Promise<number> {
-  const fileStream = createReadStream(filePath);
-  const rl = readline.createInterface({
-    input: fileStream,
-    crlfDelay: Infinity,
-  });
-  let count = 0;
-  for await (const line of rl) {
-    if (line.trim() && !line.trim().startsWith('#')) count++;
+export async function meaningfulLineCount(filename: string): Promise<number> {
+  let count = 0
+  const file = await open(filename, "r")
+  for await (const line of file.readLines()) {
+    const trimmed = line.trim()
+    if (trimmed && !trimmed.startsWith("#")) {
+      count++
+    }
   }
-  return count;
+  return count
 }
 
-// Write your shape type and associated functions here
-type Box = { kind: "Box"; width: number; length: number; depth: number };
-type Sphere = { kind: "Sphere"; radius: number };
-export type Shape = Box | Sphere;
+interface Sphere {
+  kind: "Sphere"
+  radius: number
+}
+
+interface Box {
+  kind: "Box"
+  width: number
+  length: number
+  depth: number
+}
+
+export type Shape = Sphere | Box
+
 export function volume(shape: Shape): number {
-  if (shape.kind === "Sphere") {
-    return (4 / 3) * Math.PI * Math.pow(shape.radius, 3);
-  } else {
-    return shape.width * shape.length * shape.depth;
-  }
-}
-export function surfaceArea(shape: Shape): number {
-  if (shape.kind === "Sphere") {
-    return 4 * Math.PI * Math.pow(shape.radius, 2);
-  } else {
-    return 2 * (shape.width * shape.length + shape.width * shape.depth + shape.length * shape.depth);
+  switch (shape.kind) {
+    case "Sphere":
+      return (4 / 3) * Math.PI * shape.radius ** 3
+    case "Box":
+      return shape.width * shape.length * shape.depth
   }
 }
 
-// Write your binary search tree implementation here
+export function surfaceArea(shape: Shape): number {
+  switch (shape.kind) {
+    case "Sphere":
+      return 4 * Math.PI * shape.radius ** 2
+    case "Box":
+      const { length, width, depth } = shape
+      return 2 * (length * width + length * depth + width * depth)
+  }
+}
+
 export interface BinarySearchTree<T> {
-  insert(value: T): BinarySearchTree<T>;
-  contains(value: T): boolean;
-  size(): number;
-  inorder(): Generator<T>;
-  toString(): string;
+  size(): number
+  insert(data: T): BinarySearchTree<T>
+  contains(data: T): boolean
+  inorder(): Iterable<T>
+}
+
+export class Empty<T> implements BinarySearchTree<T> {
+  size(): number {
+    return 0
+  }
+  insert(data: T): BinarySearchTree<T> {
+    return new Node<T>(data, new Empty<T>(), new Empty<T>())
+  }
+  contains(data: T): boolean {
+    return false
+  }
+  *inorder(): Iterable<T> {}
+  toString(): string {
+    return "()"
+  }
 }
 
 class Node<T> implements BinarySearchTree<T> {
-  left: BinarySearchTree<T>;
-  right: BinarySearchTree<T>;
-  value: T;
-  constructor(value: T, left: BinarySearchTree<T> = new Empty(), right: BinarySearchTree<T> = new Empty()) {
-    this.value = value;
-    this.left = left;
-    this.right = right;
+  constructor(
+    private data: T,
+    private left: BinarySearchTree<T>,
+    private right: BinarySearchTree<T>
+  ) {}
+
+  size(): number {
+    return this.left.size() + this.right.size() + 1
   }
-  insert(value: T): BinarySearchTree<T> {
-    if (value < this.value) {
-      return new Node(this.value, this.left.insert(value), this.right);
-    } else if (value > this.value) {
-      return new Node(this.value, this.left, this.right.insert(value));
+
+  insert(data: T): BinarySearchTree<T> {
+    if (data < this.data) {
+      return new Node(this.data, this.left.insert(data), this.right)
+    } else if (data > this.data) {
+      return new Node(this.data, this.left, this.right.insert(data))
     } else {
-      return this;
+      return this
     }
   }
-  contains(value: T): boolean {
-    if (value === this.value) return true;
-    if (value < this.value) return this.left.contains(value);
-    return this.right.contains(value);
-  }
-  size(): number {
-    return 1 + this.left.size() + this.right.size();
-  }
-  *inorder(): Generator<T> {
-    yield* this.left.inorder();
-    yield this.value;
-    yield* this.right.inorder();
-  }
-  toString(): string {
-    const leftStr = this.left.toString();
-    const rightStr = this.right.toString();
-    return `(${leftStr}${this.value}${rightStr})`;
-  }
-}
 
-class Empty<T> implements BinarySearchTree<T> {
-  insert(value: T): BinarySearchTree<T> {
-    return new Node(value);
+  contains(data: T): boolean {
+    if (data < this.data) {
+      return this.left.contains(data)
+    } else if (data > this.data) {
+      return this.right.contains(data)
+    } else {
+      return true
+    }
   }
-  contains(value: T): boolean {
-    return false;
+
+  *inorder(): Iterable<T> {
+    yield* this.left.inorder()
+    yield this.data
+    yield* this.right.inorder()
   }
-  size(): number {
-    return 0;
-  }
-  *inorder(): Generator<T> {}
+
   toString(): string {
-    return "";
+    return `(${this.left}${this.data}${this.right})`.replaceAll("()", "")
   }
 }
-export { Node, Empty };

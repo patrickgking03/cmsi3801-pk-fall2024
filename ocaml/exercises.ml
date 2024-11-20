@@ -1,6 +1,6 @@
 exception Negative_Amount
 
-let change amount =
+let change (amount: int) =
   if amount < 0 then
     raise Negative_Amount
   else
@@ -12,83 +12,88 @@ let change amount =
     in
     aux amount denominations
 
-(* Write your first then apply function here *)
-let first_then_apply arr predicate func =
-  try
-    Some (func (List.find predicate arr))
-  with
-  | Not_found -> None
+let first_then_apply (array: 'a list) (predicate: 'a -> bool) (consumer: 'a -> 'b option) =
+  match List.find_opt predicate array with
+  | Some x -> consumer x
+  | None -> None
 
-(* Write your powers generator here *)
+(*
+  This also works:
+  List.find_opt predicate array |> Option.map consumer |> Option.join
+*)
+
 let powers_generator base =
-  let rec aux current =
-    Seq.Cons (current, fun () -> aux (current * base))
+  let rec gen_from power () =
+    Seq.Cons (power, gen_from (power * base))
   in
-  aux 1
+  gen_from 1
 
-(* Write your line count function here *)
 let meaningful_line_count filename =
-  let ic = open_in filename in
-  let rec count_lines acc =
-    try
-      let line = input_line ic in
-      if String.trim line = "" || String.get line 0 = '#' then
-        count_lines acc
-      else
-        count_lines (acc + 1)
-    with End_of_file ->
-      close_in ic;
-      acc
+
+  let is_meaningful_line line =
+    let trimmed = String.trim line in
+    trimmed <> "" && not (String.starts_with ~prefix:"#" trimmed)
   in
-  count_lines 0
 
-(* Write your shape type and associated functions here *)
+  let ic = open_in filename in
+  let finally () = close_in ic in
+
+  let rec count_lines count =
+    match input_line ic with
+    | line ->
+      let new_count = if is_meaningful_line line then count + 1 else count in
+      count_lines new_count
+    | exception End_of_file ->
+      count
+  in
+  Fun.protect ~finally (fun () -> count_lines 0)
+
 type shape =
-  | Box of { width : float; length : float; depth : float }
-  | Sphere of { radius : float }
-let volume shape =
-  match shape with
-  | Box { width; length; depth } -> width *. length *. depth
-  | Sphere { radius } -> (4.0 /. 3.0) *. Float.pi *. (radius ** 3.0)
-let surface_area shape =
-  match shape with
-  | Box { width; length; depth } ->
-      2.0 *. ((width *. length) +. (width *. depth) +. (length *. depth))
-  | Sphere { radius } -> 4.0 *. Float.pi *. (radius ** 2.0)
+  | Sphere of float
+  | Box of float * float * float
 
-(* Write your binary search tree implementation here *)
-module BinarySearchTree = struct
-  type 'a tree =
-    | Empty
-    | Node of { value : 'a; left : 'a tree; right : 'a tree }
-  let rec insert tree value =
-    match tree with
-    | Empty -> Node { value; left = Empty; right = Empty }
-    | Node { value = v; left; right } ->
-        if value < v then Node { value = v; left = insert left value; right }
-        else if value > v then Node { value = v; left; right = insert right value }
-        else tree
-  let rec contains tree value =
-    match tree with
-    | Empty -> false
-    | Node { value = v; left; right } ->
-        if value = v then true else if value < v then contains left value else contains right value
-  let rec size tree =
-    match tree with
-    | Empty -> 0
-    | Node { left; right; _ } -> 1 + size left + size right
-  let rec inorder tree =
-    match tree with
-    | Empty -> Seq.empty
-    | Node { value; left; right } ->
-        let left_seq = inorder left in
-        let right_seq = inorder right in
-        Seq.append left_seq (Seq.cons value right_seq)
-  let to_string tree =
-    let rec aux tree =
-      match tree with
-      | Empty -> "()"
-      | Node { value; left; right } -> "(" ^ aux left ^ string_of_int value ^ aux right ^ ")"
-    in
-    aux tree
-end
+let volume s =
+  match s with
+  | Sphere r -> (4.0 /. 3.0) *. Float.pi *. (r ** 3.0)
+  | Box (w, l, d) -> w *. l *. d
+
+let surface_area s =
+  match s with
+  | Sphere r -> 4.0 *. Float.pi *. (r ** 2.0)
+  | Box (w, l, d) -> 2.0 *. ((w *. l) +. (w *. d) +. (l *. d))
+
+type 'a binary_search_tree =
+  | Empty
+  | Node of 'a * 'a binary_search_tree * 'a binary_search_tree
+
+let rec size tree =
+  match tree with
+  | Empty -> 0
+  | Node (_, left, right) -> size left + size right + 1
+
+let rec insert data tree =
+  match tree with
+  | Empty -> Node (data, Empty, Empty)
+  | Node (v, left, right) ->
+    if data < v then
+      Node (v, insert data left, right)
+    else if data > v then
+      Node (v, left, insert data right)
+    else
+      tree
+
+let rec contains data tree =
+  match tree with
+  | Empty -> false
+  | Node (v, left, right) ->
+    if data < v then
+      contains data left
+    else if data > v then
+      contains data right
+    else
+      true
+
+let rec inorder tree =
+  match tree with
+  | Empty -> []
+  | Node (v, left, right) -> inorder left @ [v] @ inorder right
