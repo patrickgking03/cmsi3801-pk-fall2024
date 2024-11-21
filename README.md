@@ -29,6 +29,8 @@ Your homework submissions will consist of programs in the following languages. T
     - Status: **Completed**
     - Group Members: **Patrick King**
 - **Homework 5 (Concurrency)**: Go
+    - Status: **In Progress**
+    - Group Members: **Patrick King**
 
 At each homework deadline, the graders will clone your repo and run the tests. I will be inspecting the source code, grading your work on style, clarity, and appropriate use of language idioms. Do not throw away points in these areas: **use code formatters and linters**. Please consider it a moral obligation to use these tools. Not doing so is a violation of professional ethics. _You must respect the naming, capitalization, formatting, spacing, and indentation conventions of each language_.
 
