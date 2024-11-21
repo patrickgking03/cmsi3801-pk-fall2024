@@ -17,20 +17,27 @@ Your homework submissions will consist of programs in the following languages. T
     - Status: **Completed**
     - Group Members: **Patrick King**
     - Updates: **Correct Solutions Added**
+    - Description: This assignment focused on scripting across three languages with tasks like filtering collections, creating generators, and building chainable functions. Implemented parsers to count meaningful lines and modeled Quaternions with operations like addition and multiplication. It was a great introduction to the unique paradigms and idioms of each language, especially their handling of closures and asynchronous behavior.
 - **Homework 2 (Enterprise)**: Java, Kotlin, Swift
     - Status: **Completed**
     - Group Members: **Patrick King**
     - Updates: **Correct Solutions Added**
+    - Description: This assignment explored object-oriented programming concepts in Java, Kotlin, and Swift. I worked on chainable objects, file parsers, and immutable binary search trees, applying principles like encapsulation and inheritance. The implementation of Quaternions as immutable classes highlighted the differences in design philosophy between these enterprise-focused languages.
 - **Homework 3 (Theory)**: TypeScript, OCaml, Haskell
     - Status: **Completed**
     - Group Members: **Patrick King**
     - Updates: **Correct Solutions Added**
+    - Description: This assignment emphasized functional programming with tasks in TypeScript, OCaml, and Haskell. I built polymorphic functions, infinite sequences, and persistent binary search trees using algebraic data types. It was a great opportunity to apply concepts like immutability, recursion, and type safety across three distinctly typed functional languages.
 - **Homework 4 (Systems)**: C, C++, Rust
     - Status: **Completed**
     - Group Members: **Patrick King**
+    - Updates: **None Yet**
+    - Description: This assignment involved implementing stack data structures in C, C++, and Rust with a focus on memory management. Tasks included resizing arrays efficiently and ensuring safety through Rust’s model. It highlighted the challenges and benefits of manual memory management in low-level systems programming.
 - **Homework 5 (Concurrency)**: Go
     - Status: **In Progress**
     - Group Members: **Patrick King**
+    - Updates: **None Yet**
+    - Description: This assignment involves creating a restaurant simulation in Go to model concurrent processes like customers placing orders and cooks preparing meals. The focus is on managing concurrency with goroutines, channels, and timeouts. It provides hands-on experience with Go’s lightweight concurrency model and synchronization tools.
 
 At each homework deadline, the graders will clone your repo and run the tests. I will be inspecting the source code, grading your work on style, clarity, and appropriate use of language idioms. Do not throw away points in these areas: **use code formatters and linters**. Please consider it a moral obligation to use these tools. Not doing so is a violation of professional ethics. _You must respect the naming, capitalization, formatting, spacing, and indentation conventions of each language_.
 
