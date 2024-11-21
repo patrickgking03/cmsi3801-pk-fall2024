@@ -14,15 +14,20 @@ Don’t bother with notes to the graders. Such notes go into your BrightSpace su
 Your homework submissions will consist of programs in the following languages. To keep things simple, there is a separate folder for each language.
 
 - **Homework 1 (Scripting)**: Lua, Python, JavaScript
-    - **Completed**
-    - **Correct Solutions Added**
+    - Status: **Completed**
+    - Group Members: **Patrick King**
+    - Updates: **Correct Solutions Added**
 - **Homework 2 (Enterprise)**: Java, Kotlin, Swift
-    - **Completed**
-    - **Correct Solutions Added**
+    - Status: **Completed**
+    - Group Members: **Patrick King**
+    - Updates: **Correct Solutions Added**
 - **Homework 3 (Theory)**: TypeScript, OCaml, Haskell
-    - **Completed**
-    - **Correct Solutions Added**
+    - Status: **Completed**
+    - Group Members: **Patrick King**
+    - Updates: **Correct Solutions Added**
 - **Homework 4 (Systems)**: C, C++, Rust
+    - Status: **Completed**
+    - Group Members: **Patrick King**
 - **Homework 5 (Concurrency)**: Go
 
 At each homework deadline, the graders will clone your repo and run the tests. I will be inspecting the source code, grading your work on style, clarity, and appropriate use of language idioms. Do not throw away points in these areas: **use code formatters and linters**. Please consider it a moral obligation to use these tools. Not doing so is a violation of professional ethics. _You must respect the naming, capitalization, formatting, spacing, and indentation conventions of each language_.

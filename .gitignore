@@ -23,3 +23,6 @@ __pycache__
 ExercisesTest
 exercises
 main
+.prettierrc.json
+LICENSE
+test-for-line-count.txt
