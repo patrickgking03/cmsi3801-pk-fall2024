@@ -14,9 +14,9 @@ import (
 // and sleep the current goroutine for that much time.
 
 func do(seconds int, action ...any) {
-    log.Println(action...)
-    randomMillis := 500 * seconds + rand.Intn(500 * seconds)
-    time.Sleep(time.Duration(randomMillis) * time.Millisecond)
+	log.Println(action...)
+	randomMillis := 500*seconds + rand.Intn(500*seconds)
+	time.Sleep(time.Duration(randomMillis) * time.Millisecond)
 }
 
 // Implement the rest of the simulation here. You may need to add more imports
