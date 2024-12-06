@@ -59,7 +59,7 @@ Your homework submissions will consist of programs in the following languages. T
 ---
 
 ### **Homework 5 (Concurrency):** Go  
-- **Status:** In Progress  
+- **Status:** Completed  
 - **Group Members:** Patrick King  
 - **Updates:** None Yet  
 - **Description:**  
