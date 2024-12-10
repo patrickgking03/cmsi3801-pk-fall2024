@@ -1,4 +1,4 @@
-# **CMSI 3801: Homework Folder**  
+# **CMSI 3801: Homework Repository**  
 ### **By Patrick King**  
 ### **Fall 2024 – Languages and Automata I**  
 
@@ -6,55 +6,70 @@
 
 ## **Welcome!**
 
-This repository contains my submissions for CMSI 3801 homework assignments. Below, you’ll find detailed descriptions of each assignment, including the tasks completed and the languages used.  
+This repository contains my homework submissions for CMSI 3801, a course focused on programming language concepts, paradigms, and automata. Each assignment highlights different programming paradigms and demonstrates concepts across various languages. Below is an overview of the assignments, languages used, and their respective learning objectives.
 
 ---
 
-## **Homework Submissions**
+## **Homework Overview**
 
-### **Homework 1 (Scripting):** Lua, Python, JavaScript  
-- **Status:** Completed  
-- **Group Members:** Patrick King  
-- **Description:**  
-  This assignment focused on scripting across three languages with tasks like filtering collections, creating generators, and building chainable functions. Implemented parsers to count meaningful lines and modeled Quaternions with operations like addition and multiplication. It was a great introduction to the unique paradigms and idioms of each language, especially their handling of closures and asynchronous behavior.  
-
----
-
-### **Homework 2 (Enterprise):** Java, Kotlin, Swift  
-- **Status:** Completed  
-- **Group Members:** Patrick King   
-- **Description:**  
-  This assignment explored object-oriented programming concepts in Java, Kotlin, and Swift. I worked on chainable objects, file parsers, and immutable binary search trees, applying principles like encapsulation and inheritance. The implementation of Quaternions as immutable classes highlighted the differences in design philosophy between these enterprise-focused languages.  
+### **Homework 1: Scripting**  
+- **Languages:** Lua, Python, JavaScript  
+- **Status:** ✅ Completed  
+- **Highlights:**  
+  - Implemented sequence filters with predicates and generators/coroutines.  
+  - Created chainable functions to model functional idioms.  
+  - Counted meaningful lines in files, ignoring comments and whitespace.  
+  - Modeled Quaternions with operations like addition, multiplication, and conjugation.  
+  - Focused on closures, asynchronous behavior, and functional paradigms.
 
 ---
 
-### **Homework 3 (Theory):** TypeScript, OCaml, Haskell  
-- **Status:** Completed  
-- **Group Members:** Patrick King  
-- **Description:**  
-  This assignment emphasized functional programming with tasks in TypeScript, OCaml, and Haskell. I built polymorphic functions, infinite sequences, and persistent binary search trees using algebraic data types. It was a great opportunity to apply concepts like immutability, recursion, and type safety across three distinctly typed functional languages.  
+### **Homework 2: Enterprise Programming**  
+- **Languages:** Java, Kotlin, Swift  
+- **Status:** ✅ Completed  
+- **Highlights:**  
+  - Explored object-oriented principles: encapsulation, inheritance, and abstraction.  
+  - Developed chainable object interfaces and immutable binary search trees.  
+  - Built file parsers and implemented operations on Quaternions as immutable objects.  
+  - Compared design philosophies across enterprise-oriented languages.
 
 ---
 
-### **Homework 4 (Systems):** C, C++, Rust  
-- **Status:** Completed  
-- **Group Members:** Patrick King  
-- **Description:**  
-  This assignment involved implementing stack data structures in C, C++, and Rust with a focus on memory management. Tasks included resizing arrays efficiently and ensuring safety through Rust’s model. It highlighted the challenges and benefits of manual memory management in low-level systems programming.  
+### **Homework 3: Functional Programming**  
+- **Languages:** TypeScript, OCaml, Haskell  
+- **Status:** ✅ Completed  
+- **Highlights:**  
+  - Implemented polymorphic functions and infinite sequences of powers.  
+  - Built persistent binary search trees using algebraic data types.  
+  - Applied type inference, recursion, and functional paradigms.  
+  - Demonstrated immutability and type safety in strongly typed functional languages.
 
 ---
 
-### **Homework 5 (Concurrency):** Go  
-- **Status:** Completed  
-- **Group Members:** Patrick King  
-- **Description:**  
-  This assignment involves creating a restaurant simulation in Go to model concurrent processes like customers placing orders and cooks preparing meals. The focus is on managing concurrency with goroutines, channels, and timeouts. It provides hands-on experience with Go’s lightweight concurrency model and synchronization tools.  
+### **Homework 4: Systems Programming**  
+- **Languages:** C, C++, Rust  
+- **Status:** ✅ Completed  
+- **Highlights:**  
+  - Implemented stack data structures with resizable arrays and efficient memory management.  
+  - Practiced manual memory management in C and C++.  
+  - Leveraged Rust’s ownership model for safety and concurrency.  
+  - Focused on low-level systems programming concepts.
 
 ---
 
-## **The Test Suites**
+### **Homework 5: Concurrency**  
+- **Languages:** Go  
+- **Status:** ✅ Completed  
+- **Highlights:**  
+  - Created a restaurant simulation using Go’s concurrency model.  
+  - Simulated customer and cook interactions with goroutines and channels.  
+  - Managed synchronization, timeouts, and state in a lightweight concurrency environment.  
 
-The test suites are run like so:
+---
+
+## **Running Test Suites**
+
+Each homework includes comprehensive test suites to validate correctness. Below are the commands to run tests in different languages:
 
 ### Lua
 

@@ -19,57 +19,61 @@ func do(seconds int, action ...any) {
 	time.Sleep(time.Duration(randomMillis) * time.Millisecond)
 }
 
-// represents an order placed by customer
+// Represents an order placed by a customer, with details for processing and delivery.
 type Order struct {
-	id         uint64      // unique order ID
-	customer   string      // customer placing order
-	replyChan  chan *Order // channel for cook to send prepared meal
-	preparedBy string      // name of cook who prepared the meal
+	id         uint64      // Unique order ID.
+	customer   string      // Customer who placed the order.
+	replyChan  chan *Order // Channel used by cooks to send back prepared orders.
+	preparedBy string      // Name of the cook who prepared the meal.
 }
 
-// global atomic counter for unique order IDs
+// Global atomic counter to generate unique order IDs across all orders.
 var orderCounter atomic.Uint64
 
-// waiter channel to hold up to 3 orders at a time
+// Buffered channel used by waiters to manage a queue of up to 3 orders at a time.
 var waiter = make(chan *Order, 3)
 
-// cook goroutine to process orders
+// Simulates a cook who processes orders from the waiter channel until shutdown.
 func cook(name string, wg *sync.WaitGroup, shutdown <-chan struct{}) {
-	defer wg.Done()
+	defer wg.Done() // Decrements the wait group counter when the goroutine exits.
 	log.Println(name, "starting work")
 
 	for {
 		select {
-		case <-shutdown: // exit when restaurant closes
+		case <-shutdown: // Gracefully exit if the restaurant shuts down.
 			log.Println(name, "shutting down")
 			return
-		case order, ok := <-waiter: // process orders if available
+		case order, ok := <-waiter: // Fetch an order from the waiter if available.
 			if !ok {
-				// waiter channel closed
+				// Channel closed, no more orders to process.
 				return
 			}
+			// Simulate cooking the order.
 			do(10, name, "cooking order", order.id, "for", order.customer)
-			order.preparedBy = name
+			order.preparedBy = name // Assign the cook's name to the order.
+
+			// Attempt to deliver the prepared meal to the customer.
 			select {
-			case order.replyChan <- order: // deliver meal to customer
-			case <-shutdown: // exit if shutdown during delivery
+			case order.replyChan <- order: // Successfully deliver the meal.
+			case <-shutdown: // Exit if shutdown occurs during delivery.
 				return
 			}
 		}
 	}
 }
 
-// customer goroutine to eat 5 meals before leaving
+// Simulates a customer who places up to 5 orders and eats the meals before leaving.
 func customer(name string, wg *sync.WaitGroup, shutdown <-chan struct{}) {
-	defer wg.Done()
+	defer wg.Done() // Decrements the wait group counter when the goroutine exits.
 
-	mealsEaten := 0
+	mealsEaten := 0 // Counter to track the number of meals the customer has eaten.
 	for mealsEaten < 5 {
 		select {
-		case <-shutdown: // exit early if restaurant closes
+		case <-shutdown: // Exit early if the restaurant shuts down.
 			log.Println(name, "leaving early due to restaurant closing")
 			return
 		default:
+			// Create a new order with a unique ID and reply channel.
 			order := &Order{
 				id:        orderCounter.Add(1),
 				customer:  name,
@@ -77,18 +81,19 @@ func customer(name string, wg *sync.WaitGroup, shutdown <-chan struct{}) {
 			}
 			log.Println(name, "placed order", order.id)
 
-			// try placing order with the waiter, with a 7-second timeout
+			// Try to place the order with the waiter, with a 7-second timeout.
 			select {
-			case waiter <- order:
+			case waiter <- order: // Successfully placed the order.
 				select {
-				case meal := <-order.replyChan: // wait for meal
+				case meal := <-order.replyChan: // Wait for the cooked meal.
+					// Simulate eating the meal.
 					do(2, name, "eating cooked order", meal.id, "prepared by", meal.preparedBy)
 					mealsEaten++
-				case <-shutdown: // exit if restaurant closes during meal
+				case <-shutdown: // Exit if shutdown occurs while waiting for the meal.
 					log.Println(name, "leaving while waiting for meal due to restaurant closing")
 					return
 				}
-			case <-time.After(7 * time.Second): // abandon order if waiter is busy
+			case <-time.After(7 * time.Second): // Abandon order if the waiter is busy.
 				do(5, name, "waiting too long, abandoning order", order.id)
 			}
 		}
@@ -96,34 +101,35 @@ func customer(name string, wg *sync.WaitGroup, shutdown <-chan struct{}) {
 	log.Println(name, "going home after eating 5 meals")
 }
 
+// Main function to simulate the restaurant's operation.
 func main() {
-	rand.Seed(time.Now().UnixNano()) // seed random number generator
+	rand.Seed(time.Now().UnixNano()) // Seed the random number generator.
 
-	// configuration
+	// Configuration: customers and cooks in the simulation.
 	customers := []string{"Ani", "Bai", "Cat", "Dao", "Eve", "Fay", "Gus", "Hua", "Iza", "Jai"}
 	cooks := []string{"Remy", "Colette", "Linguini"}
-	var wg sync.WaitGroup
-	shutdown := make(chan struct{}) // channel to signal shutdown
+	var wg sync.WaitGroup           // Wait group to ensure all goroutines finish.
+	shutdown := make(chan struct{}) // Channel to signal restaurant shutdown.
 
-	// launch cook goroutines
+	// Launch cook goroutines for each cook in the simulation.
 	for _, cookName := range cooks {
 		wg.Add(1)
 		go cook(cookName, &wg, shutdown)
 	}
 
-	// launch customer goroutines
+	// Launch customer goroutines for each customer in the simulation.
 	for _, customerName := range customers {
 		wg.Add(1)
 		go customer(customerName, &wg, shutdown)
 	}
 
-	// limit the restaurant's runtime to 20 seconds
+	// Schedule the restaurant to close after 20 seconds.
 	time.AfterFunc(20*time.Second, func() {
 		log.Println("Restaurant closing")
-		close(shutdown) // signal all goroutines to stop
+		close(shutdown) // Signal all goroutines to stop.
 	})
 
-	// wait for all goroutines to finish
+	// Wait for all goroutines to finish before exiting.
 	wg.Wait()
 	log.Println("Restaurant has closed")
 }

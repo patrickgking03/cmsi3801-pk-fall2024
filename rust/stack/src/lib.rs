@@ -1,34 +1,34 @@
 pub struct Stack<T> {
-    items: Vec<T>,
+    items: Vec<T>, // Stores the elements of the stack.
 }
 
 impl<T> Stack<T> {
-    // new function
+    // Creates a new, empty stack.
     pub fn new() -> Self {
         Stack { items: Vec::new() }
     }
 
-    // push function
+    // Adds an element to the top of the stack.
     pub fn push(&mut self, item: T) {
         self.items.push(item);
     }
 
-    // pop function
+    // Removes and returns the top element of the stack, or None if empty.
     pub fn pop(&mut self) -> Option<T> {
         self.items.pop()
     }
 
-    // peek function
+    // Returns a reference to the top element without removing it, or None if empty.
     pub fn peek(&self) -> Option<&T> {
         self.items.last()
     }
 
-    // is_empty function
+    // Checks if the stack is empty.
     pub fn is_empty(&self) -> bool {
         self.items.is_empty()
     }
 
-    // len function
+    // Returns the number of elements in the stack.
     pub fn len(&self) -> usize {
         self.items.len()
     }

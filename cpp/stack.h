@@ -66,6 +66,6 @@ private:
     std::unique_ptr<T[]> new_elements(new T[new_capacity]); // new array
     std::copy(elements.get(), elements.get() + top, new_elements.get()); // copy old data
     elements = std::move(new_elements); // transfer ownership
-    capacity = new_capacity; // update stack's capacity
+    capacity = new_capacity; // update the stack's capacity
   }
 };
