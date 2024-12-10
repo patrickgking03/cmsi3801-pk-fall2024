@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Complete your string stack implementation in this file.
-
 // structure of the stack
 struct _Stack {
     char** data;       // pointer to stack's elements
