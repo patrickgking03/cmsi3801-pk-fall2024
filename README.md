@@ -6,17 +6,7 @@
 
 ## **Welcome!**
 
-This repository contains submissions for CMSI 3801 homework assignments. Below, you’ll find detailed descriptions of each assignment, including the tasks completed and the languages used.  
-
----
-
-## **Instructions**
-
-Fork this repo for your homework submissions. Make sure your fork has a nice, descriptive name. Leaving the name as “lmu-cmsi-3801-template” is misleading, and keeping it indicates you are not taking sufficient pride in your work. After forking, **please replace the contents of this readme** file with information about your submissions, including the name(s) of the students, and a description of each assignment (as they are turned in).  
-
-Don’t bother with notes to the graders. Such notes go into your BrightSpace submissions, not your GitHub repository.  
-
-Your homework submissions will consist of programs in the following languages. To keep things simple, there is a separate folder for each language.  
+This repository contains my submissions for CMSI 3801 homework assignments. Below, you’ll find detailed descriptions of each assignment, including the tasks completed and the languages used.  
 
 ---
 
@@ -25,7 +15,6 @@ Your homework submissions will consist of programs in the following languages. T
 ### **Homework 1 (Scripting):** Lua, Python, JavaScript  
 - **Status:** Completed  
 - **Group Members:** Patrick King  
-- **Updates:** Correct Solutions Added  
 - **Description:**  
   This assignment focused on scripting across three languages with tasks like filtering collections, creating generators, and building chainable functions. Implemented parsers to count meaningful lines and modeled Quaternions with operations like addition and multiplication. It was a great introduction to the unique paradigms and idioms of each language, especially their handling of closures and asynchronous behavior.  
 
@@ -33,8 +22,7 @@ Your homework submissions will consist of programs in the following languages. T
 
 ### **Homework 2 (Enterprise):** Java, Kotlin, Swift  
 - **Status:** Completed  
-- **Group Members:** Patrick King  
-- **Updates:** Correct Solutions Added  
+- **Group Members:** Patrick King   
 - **Description:**  
   This assignment explored object-oriented programming concepts in Java, Kotlin, and Swift. I worked on chainable objects, file parsers, and immutable binary search trees, applying principles like encapsulation and inheritance. The implementation of Quaternions as immutable classes highlighted the differences in design philosophy between these enterprise-focused languages.  
 
@@ -43,7 +31,6 @@ Your homework submissions will consist of programs in the following languages. T
 ### **Homework 3 (Theory):** TypeScript, OCaml, Haskell  
 - **Status:** Completed  
 - **Group Members:** Patrick King  
-- **Updates:** Correct Solutions Added  
 - **Description:**  
   This assignment emphasized functional programming with tasks in TypeScript, OCaml, and Haskell. I built polymorphic functions, infinite sequences, and persistent binary search trees using algebraic data types. It was a great opportunity to apply concepts like immutability, recursion, and type safety across three distinctly typed functional languages.  
 
@@ -52,7 +39,6 @@ Your homework submissions will consist of programs in the following languages. T
 ### **Homework 4 (Systems):** C, C++, Rust  
 - **Status:** Completed  
 - **Group Members:** Patrick King  
-- **Updates:** None Yet  
 - **Description:**  
   This assignment involved implementing stack data structures in C, C++, and Rust with a focus on memory management. Tasks included resizing arrays efficiently and ensuring safety through Rust’s model. It highlighted the challenges and benefits of manual memory management in low-level systems programming.  
 
@@ -61,7 +47,6 @@ Your homework submissions will consist of programs in the following languages. T
 ### **Homework 5 (Concurrency):** Go  
 - **Status:** Completed  
 - **Group Members:** Patrick King  
-- **Updates:** None Yet  
 - **Description:**  
   This assignment involves creating a restaurant simulation in Go to model concurrent processes like customers placing orders and cooks preparing meals. The focus is on managing concurrency with goroutines, channels, and timeouts. It provides hands-on experience with Go’s lightweight concurrency model and synchronization tools.  
 
@@ -69,9 +54,7 @@ Your homework submissions will consist of programs in the following languages. T
 
 ## **The Test Suites**
 
-The test files are included in the repo already. They are available for YOU! They will help you not only learn the languages and concepts covered in this course, but to help you with professional practice. You should get accustomed to writing code to make tests pass. As you grow in your profession, you will get used to writing your tests early.  
-
-The test suites are run like so (assuming you have a Unix-like shell, modify as necessary if you have Windows):
+The test suites are run like so:
 
 ### Lua
 
@@ -150,12 +133,3 @@ cargo test
 ```
 go run restaurant.go
 ```
-
-## Grading Notes
-
-Your grade is a reflection not only of your ability to write code to pass existing tests, but also of your ability to construct software in a professional setting. Therefore, the following will contribute rather heavily to your score:
-
-- **Following all submission instructions**! Pay attention to every requirement such as replacing the contents of this readme file and including the names of all participants of any group work.
-- **Keeping a pristine GitHub repository**. Do not push any file that does not belong (including but not limited to that silly `DS_Store`). Make sure all generated executables, intermediate files, third-party libraries, etc. are not committed. Your repo contents should be limited to your solution files, tests, configuration files, and `.gitignore` files.
-- **Adherence to naming and formatting conventions for the language you are writing in**. Inconsistent indentation, for example, has no place in professional or student software. Neither does end-of-line whitespace, huge chunks of contiguous blank lines, and other types of messy coding practices that show friends, family, colleagues, and potential employers that you don’t care about your work.
-- (As always) The **readability and maintainability** of your code.
