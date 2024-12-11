@@ -1,42 +1,54 @@
 import Foundation
 
+// Error for handling negative amounts in the `change` function.
 struct NegativeAmountError: Error {}
+
+// Error for handling nonexistent files in the `meaningfulLineCount` function.
 struct NoSuchFileError: Error {}
 
-func change(_ amount: Int) -> Result<[Int:Int], NegativeAmountError> {
-    if amount < 0 {
+// Converts an amount into the minimum number of coins.
+func change(_ amount: Int) -> Result<[Int: Int], NegativeAmountError> {
+    guard amount >= 0 else {
         return .failure(NegativeAmountError())
     }
-    var (counts, remaining) = ([Int:Int](), amount)
-    for denomination in [25, 10, 5, 1] {
-        (counts[denomination], remaining) = 
-            remaining.quotientAndRemainder(dividingBy: denomination)
+    var remaining = amount
+    var coinCounts = [Int: Int]()
+    for coin in [25, 10, 5, 1] {
+        let (count, remainder) = remaining.quotientAndRemainder(dividingBy: coin)
+        coinCounts[coin] = count
+        remaining = remainder
     }
-    return .success(counts)
+    return .success(coinCounts)
 }
 
+// Finds the first string that satisfies the predicate, then returns it lowercased.
 func firstThenLowerCase(
     of strings: [String], satisfying predicate: (String) -> Bool
 ) -> String? {
-    return strings.first(where: predicate)?.lowercased()
+    strings.first(where: predicate)?.lowercased()
 }
 
+// Represents a chainable sentence builder.
 struct Sayer {
     let phrase: String
+    
+    // Appends a word to the current phrase.
     func and(_ word: String) -> Sayer {
-        return Sayer(phrase: "\(self.phrase) \(word)")
+        Sayer(phrase: "\(phrase) \(word)")
     }
 }
 
+// Creates a Sayer with an optional starting word.
 func say(_ word: String = "") -> Sayer {
-    return Sayer(phrase: word)
+    Sayer(phrase: word)
 }
 
+// Counts the number of meaningful lines in a file asynchronously.
 func meaningfulLineCount(_ filename: String) async -> Result<Int, Error> {
-    var count = 0
     do {
-        let url = URL(fileURLWithPath: filename)
-        for try await line in url.lines {
+        var count = 0
+        let fileURL = URL(fileURLWithPath: filename)
+        for try await line in fileURL.lines {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
             if !trimmed.isEmpty && !trimmed.hasPrefix("#") {
                 count += 1
@@ -48,17 +60,20 @@ func meaningfulLineCount(_ filename: String) async -> Result<Int, Error> {
     }
 }
 
+// Represents an immutable quaternion with coefficients (a, b, c, d).
 struct Quaternion: CustomStringConvertible, Equatable {
     let a: Double
     let b: Double
     let c: Double
     let d: Double
 
+    // Predefined constants for common quaternions.
     static let ZERO = Quaternion()
     static let I = Quaternion(b: 1)
     static let J = Quaternion(c: 1)
     static let K = Quaternion(d: 1)
 
+    // Default initializer.
     init(a: Double = 0, b: Double = 0, c: Double = 0, d: Double = 0) {
         self.a = a
         self.b = b
@@ -66,48 +81,62 @@ struct Quaternion: CustomStringConvertible, Equatable {
         self.d = d
     }
 
+    // Returns the quaternion's coefficients as an array.
     var coefficients: [Double] {
-        return [self.a, self.b, self.c, self.d]
+        [a, b, c, d]
     }
 
+    // Returns the conjugate of the quaternion.
     var conjugate: Quaternion {
-        return Quaternion(a: self.a, b: -self.b, c: -self.c, d: -self.d)
+        Quaternion(a: a, b: -b, c: -c, d: -d)
     }
 
-
-    static func +(q1: Quaternion, q2: Quaternion) -> Quaternion {
-        return Quaternion(
-            a: q1.a + q2.a,
-            b: q1.b + q2.b,
-            c: q1.c + q2.c,
-            d: q1.d + q2.d
+    // Adds two quaternions.
+    static func +(lhs: Quaternion, rhs: Quaternion) -> Quaternion {
+        Quaternion(
+            a: lhs.a + rhs.a,
+            b: lhs.b + rhs.b,
+            c: lhs.c + rhs.c,
+            d: lhs.d + rhs.d
         )
     }
 
-    static func *(q1: Quaternion, q2: Quaternion) -> Quaternion {
-        return Quaternion(
-            a: q2.a * q1.a - q2.b * q1.b - q2.c * q1.c - q2.d * q1.d,
-            b: q2.a * q1.b + q2.b * q1.a - q2.c * q1.d + q2.d * q1.c,
-            c: q2.a * q1.c + q2.b * q1.d + q2.c * q1.a - q2.d * q1.b,
-            d: q2.a * q1.d - q2.b * q1.c + q2.c * q1.b + q2.d * q1.a
+    // Multiplies two quaternions.
+    static func *(lhs: Quaternion, rhs: Quaternion) -> Quaternion {
+        Quaternion(
+            a: lhs.a * rhs.a - lhs.b * rhs.b - lhs.c * rhs.c - lhs.d * rhs.d,
+            b: lhs.a * rhs.b + lhs.b * rhs.a + lhs.c * rhs.d - lhs.d * rhs.c,
+            c: lhs.a * rhs.c - lhs.b * rhs.d + lhs.c * rhs.a + lhs.d * rhs.b,
+            d: lhs.a * rhs.d + lhs.b * rhs.c - lhs.c * rhs.b + lhs.d * rhs.a
         )
     }
 
+    // Custom string representation of the quaternion.
     var description: String {
-        var s = ""
-        for (c, unit) in zip(self.coefficients, ["", "i", "j", "k"]) where c != 0 {
-            s += c < 0 ? "-" : s == "" ? "" : "+"
-            s += abs(c) == 1 && unit != "" ? "" : String(abs(c))
-            s += unit
+        var result = ""
+        let components = zip(coefficients, ["", "i", "j", "k"])
+        for (value, unit) in components where value != 0 {
+            if !result.isEmpty && value > 0 {
+                result.append("+")
+            }
+            if abs(value) != 1 || unit.isEmpty {
+                result.append("\(value)")
+            }
+            if abs(value) == 1 && !unit.isEmpty {
+                result.append(value < 0 ? "-" : "")
+            }
+            result.append(unit)
         }
-        return s.isEmpty ? "0" : s
+        return result.isEmpty ? "0" : result
     }
 }
 
+// Represents a binary search tree.
 enum BinarySearchTree: CustomStringConvertible {
     case empty
     indirect case node(String, BinarySearchTree, BinarySearchTree)
 
+    // Calculates the size of the tree.
     var size: Int {
         switch self {
         case .empty:
@@ -117,34 +146,37 @@ enum BinarySearchTree: CustomStringConvertible {
         }
     }
 
+    // Inserts a new value into the tree.
     func insert(_ data: String) -> BinarySearchTree {
         switch self {
         case .empty:
             return .node(data, .empty, .empty)
-        case let .node(selfData, left, right):
-            if data < selfData {
-                return .node(selfData, left.insert(data), right)
-            } else if data > selfData {
-                return .node(selfData, left, right.insert(data))
+        case let .node(value, left, right):
+            if data < value {
+                return .node(value, left.insert(data), right)
+            } else if data > value {
+                return .node(value, left, right.insert(data))
             }
             return self
         }
     }
 
+    // Checks if the tree contains a value.
     func contains(_ data: String) -> Bool {
         switch self {
         case .empty:
             return false
-        case let .node(selfData, left, right):
-            if data < selfData {
+        case let .node(value, left, right):
+            if data < value {
                 return left.contains(data)
-            } else if data > selfData {
+            } else if data > value {
                 return right.contains(data)
             }
             return true
         }
     }
 
+    // Custom string representation of the tree.
     var description: String {
         switch self {
         case .empty:
