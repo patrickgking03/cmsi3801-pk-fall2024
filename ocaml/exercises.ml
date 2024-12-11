@@ -1,99 +1,102 @@
 exception Negative_Amount
 
-let change (amount: int) =
+let change amount =
   if amount < 0 then
     raise Negative_Amount
   else
     let denominations = [25; 10; 5; 1] in
-    let rec aux remaining denominations =
-      match denominations with
+    let rec aux remaining = function
       | [] -> []
       | d :: ds -> (remaining / d) :: aux (remaining mod d) ds
     in
     aux amount denominations
 
-let first_then_apply (array: 'a list) (predicate: 'a -> bool) (consumer: 'a -> 'b option) =
-  match List.find_opt predicate array with
-  | Some x -> consumer x
-  | None -> None
+(* Finds the first element in a list that satisfies a predicate and applies a function to it. *)
+let first_then_apply arr predicate func =
+  try Some (func (List.find predicate arr))
+  with Not_found -> None
 
-(*
-  This also works:
-  List.find_opt predicate array |> Option.map consumer |> Option.join
-*)
-
+(* Generates an infinite sequence of powers of a given base. *)
 let powers_generator base =
-  let rec gen_from power () =
-    Seq.Cons (power, gen_from (power * base))
+  let rec aux current =
+    Seq.Cons (current, fun () -> aux (current * base))
   in
-  gen_from 1
+  aux 1
 
+(* Counts non-empty, non-comment lines in a file. *)
 let meaningful_line_count filename =
-
-  let is_meaningful_line line =
-    let trimmed = String.trim line in
-    trimmed <> "" && not (String.starts_with ~prefix:"#" trimmed)
-  in
-
   let ic = open_in filename in
-  let finally () = close_in ic in
-
-  let rec count_lines count =
-    match input_line ic with
-    | line ->
-      let new_count = if is_meaningful_line line then count + 1 else count in
-      count_lines new_count
-    | exception End_of_file ->
-      count
+  let rec count_lines acc =
+    try
+      let line = input_line ic in
+      let trimmed = String.trim line in
+      if trimmed = "" || String.get trimmed 0 = '#' then
+        count_lines acc
+      else
+        count_lines (acc + 1)
+    with End_of_file ->
+      close_in ic; acc
   in
-  Fun.protect ~finally (fun () -> count_lines 0)
+  count_lines 0
 
+(* Defines shapes and computes volume or surface area. *)
 type shape =
-  | Sphere of float
-  | Box of float * float * float
+  | Box of { width : float; length : float; depth : float }
+  | Sphere of { radius : float }
 
-let volume s =
-  match s with
-  | Sphere r -> (4.0 /. 3.0) *. Float.pi *. (r ** 3.0)
-  | Box (w, l, d) -> w *. l *. d
+let volume shape =
+  match shape with
+  | Box { width; length; depth } -> width *. length *. depth
+  | Sphere { radius } -> (4.0 /. 3.0) *. Float.pi *. (radius ** 3.0)
 
-let surface_area s =
-  match s with
-  | Sphere r -> 4.0 *. Float.pi *. (r ** 2.0)
-  | Box (w, l, d) -> 2.0 *. ((w *. l) +. (w *. d) +. (l *. d))
+let surface_area shape =
+  match shape with
+  | Box { width; length; depth } ->
+      2.0 *. ((width *. length) +. (width *. depth) +. (length *. depth))
+  | Sphere { radius } -> 4.0 *. Float.pi *. (radius ** 2.0)
 
-type 'a binary_search_tree =
-  | Empty
-  | Node of 'a * 'a binary_search_tree * 'a binary_search_tree
+(* Binary search tree implementation. *)
+module BinarySearchTree = struct
+  type 'a tree =
+    | Empty
+    | Node of { value : 'a; left : 'a tree; right : 'a tree }
 
-let rec size tree =
-  match tree with
-  | Empty -> 0
-  | Node (_, left, right) -> size left + size right + 1
+  (* Inserts a value into the tree. *)
+  let rec insert tree value =
+    match tree with
+    | Empty -> Node { value; left = Empty; right = Empty }
+    | Node { value = v; left; right } ->
+        if value < v then Node { value = v; left = insert left value; right }
+        else if value > v then Node { value = v; left; right = insert right value }
+        else tree
 
-let rec insert data tree =
-  match tree with
-  | Empty -> Node (data, Empty, Empty)
-  | Node (v, left, right) ->
-    if data < v then
-      Node (v, insert data left, right)
-    else if data > v then
-      Node (v, left, insert data right)
-    else
-      tree
+  (* Checks if a value exists in the tree. *)
+  let rec contains tree value =
+    match tree with
+    | Empty -> false
+    | Node { value = v; left; right } ->
+        if value = v then true
+        else if value < v then contains left value
+        else contains right value
 
-let rec contains data tree =
-  match tree with
-  | Empty -> false
-  | Node (v, left, right) ->
-    if data < v then
-      contains data left
-    else if data > v then
-      contains data right
-    else
-      true
+  (* Computes the number of nodes in the tree. *)
+  let rec size tree =
+    match tree with
+    | Empty -> 0
+    | Node { left; right; _ } -> 1 + size left + size right
 
-let rec inorder tree =
-  match tree with
-  | Empty -> []
-  | Node (v, left, right) -> inorder left @ [v] @ inorder right
+  (* Produces an inorder sequence of tree values. *)
+  let rec inorder tree =
+    match tree with
+    | Empty -> Seq.empty
+    | Node { value; left; right } ->
+        Seq.append (inorder left) (Seq.cons value (inorder right))
+
+  (* Returns a string representation of the tree. *)
+  let to_string tree =
+    let rec aux = function
+      | Empty -> "()"
+      | Node { value; left; right } -> "(" ^ aux left ^ string_of_int value ^ aux right ^ ")"
+    in
+    aux tree
+end

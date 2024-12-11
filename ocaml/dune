@@ -1,5 +1,0 @@
-(executable
- (name exercises_test)
- (modules exercises exercises_test)
- (libraries oUnit)
- (flags (:standard -w -32-27)))
